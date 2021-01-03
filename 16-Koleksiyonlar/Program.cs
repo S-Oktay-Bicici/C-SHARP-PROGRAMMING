@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _20_Koleksiyonlar
+namespace Koleksiyonlar
 {
     class Program
     {
