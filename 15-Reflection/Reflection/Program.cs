@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Media;
-using System.Net.Mime;
-using System.Text;
 using System.Reflection;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Reflection
@@ -15,92 +11,85 @@ namespace Reflection
     {
         static void Main(string[] args)
         {
+            //DortIslem dortIslem=new DortIslem(2,3);
+            //Console.WriteLine(dortIslem.Topla2());
+            //Console.WriteLine(dortIslem.Topla(3, 4));
 
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            //foreach (var item in assembly.GetTypes())
-            //{
-            //    Console.WriteLine(item.Name);
-            //}
+            var tip = typeof(DortIslem);
 
-            //foreach (var item in assembly.GetType($"{assembly.GetName().Name}.Class1").GetMethods())
-            //{
-            //    Console.WriteLine(item.Name);
-            //}
+            //DortIslem dortIslem = (DortIslem)Activator.CreateInstance(tip,6,7);
+            //Console.WriteLine(dortIslem.Topla(4, 5));
+            //Console.WriteLine(dortIslem.Topla2());
 
-            foreach (var item in assembly.GetType($"{assembly.GetName().Name}.Class1").GetMethod("deneme1").GetParameters())
+            var instance = Activator.CreateInstance(tip, 6, 5);
+
+            MethodInfo methodInfo =  instance.GetType().GetMethod("Topla2");
+                
+            Console.WriteLine(methodInfo.Invoke(instance,null));
+
+            Console.WriteLine("------------------");
+            var metodlar = tip.GetMethods();
+
+            foreach (var info in metodlar)
             {
-                Console.WriteLine(item.Name);
-                Console.WriteLine(item.ParameterType);
+                Console.WriteLine("Metod adı : {0}",info.Name);
+                foreach (var parameterInfo in info.GetParameters())
+                {
+                    Console.WriteLine("Parametre : {0}",parameterInfo.Name);
+                }
+
+                foreach (var attribute in info.GetCustomAttributes())
+                {
+                    Console.WriteLine("Attribute Name : {0}",attribute.GetType().Name);
+                }
             }
-
-            //Class1 sinif=new Class1();
-            //sinif.deneme1(15,true);
-
-            var tip = assembly.GetType($"{assembly.GetName().Name}.Class1");
-            var instance = Activator.CreateInstance(tip, new object[] { 15, false });
-
-            MethodInfo method = tip.GetMethod("deneme1");
-            method.Invoke(instance, new object[] { 15, false });
-
-            MethodInfo method2 = tip.GetMethod("deneme");
-            method2.Invoke(instance, null);
-
-            PropertyInfo propertyInfo = tip.GetProperty("IntegerProp");
-
-            propertyInfo.SetValue(instance, 55);
-
-            Console.WriteLine(propertyInfo.GetValue(instance));
-
-            //Solution içindeki diğer projelere ulaşmak.(Referans Alındıysa Çalışır)
-            Assembly disAssembly = Assembly.Load(" /*proje ismini veriyoruz*/ ");
-            foreach (var sinif in disAssembly.GetTypes())
-            {
-                Console.WriteLine(sinif.Name);
-            }
-
-            var tip2 = disAssembly.GetType(" /*proje ismini veriyoruz*/ "); 
-            var instance2 = Activator.CreateInstance(tip2);
-
-            MethodInfo method3 = tip2.GetMethod("HosGeldin");
-            method3.Invoke(instance2, null);
-
-
-            //Solution içindeki diğer projelere ulaşmak.(Referans Alınmasına Gerek Yok.)
-            Assembly disAssemblyReferanssiz = Assembly.LoadFile(@" /*projenin konumunu veriyoruz*/ "); 
-
-            foreach (var sinif in disAssemblyReferanssiz.GetTypes())
-            {
-                Console.WriteLine(sinif.Name);
-            }
-
-            Assembly UygulamaAssembly=Assembly.GetExecutingAssembly();
-
-            var ReflectionTip = assembly.GetType("Reflection.ReflectionKomutlar");
-            var instanceReflection = Activator.CreateInstance(ReflectionTip);
-            Console.WriteLine("Lütfen Bir Komut Girin");
-
-            char ayrac = ' ';
-            string Komut = Console.ReadLine();
-            string[] KomutParca = Komut.Split(ayrac);
-            string[] Parametreler=new string[KomutParca.Length - 1];
-            Array.Copy(KomutParca, 1, Parametreler, 0, KomutParca.Length - 1);
-
-
-            MethodInfo KomutMetodu = ReflectionTip.GetMethod(KomutParca[0]);
-
-            if (Parametreler.Length==0)
-            {
-                 KomutMetodu.Invoke(instanceReflection, null);
-            }
-            else
-            {
-                KomutMetodu.Invoke(instanceReflection, new object[]{Parametreler});
-            }
-
-            //KomutMetodu.Invoke(instanceReflection, Parametreler.Length == 0 ? null : new object[]{ Parametreler } );
 
             Console.ReadLine();
+        }
+    }
 
+    public class DortIslem
+    {
+        private int _sayi1;
+        private int _sayi2;
+
+        public DortIslem(int sayi1, int sayi2)
+        {
+            _sayi1 = sayi1;
+            _sayi2 = sayi2;
+        }
+
+        public DortIslem()
+        {
+            
+        }
+        public int Topla(int sayi1, int sayi2)
+        {
+            return sayi1 + sayi2;
+        }
+
+        public int Carp(int sayi1, int sayi2)
+        {
+            return sayi1 * sayi2;
+        }
+
+        public int Topla2()
+        {
+            return _sayi1 + _sayi2;
+        }
+
+        [MetodName("Carpma")]
+        public int Carp2()
+        {
+            return _sayi1 * _sayi2;
+        }
+    }
+
+    public class MetodNameAttribute:Attribute
+    {
+        public MetodNameAttribute(string name)
+        {
+            
         }
     }
 }
